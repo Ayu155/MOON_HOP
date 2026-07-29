@@ -9,8 +9,23 @@
         margin:0; background:linear-gradient(#000011, #1a0033);
         font-family:'Segoe UI'; color:#fff; text-align:center; overflow:hidden;
     }
+    #logo-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        padding: 10px;
+        background: rgba(0,0,0,0.2);
+    }
+    .game-logo {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #ff00cc;
+        box-shadow: 0 0 10px rgba(255,0,204,0.5);
+    }
     #ui {
-        position:absolute; top:20px; width:100%; z-index:10;
+        position:absolute; top:75px; width:100%; z-index:10;
         background:rgba(255,255,255,0.05); backdrop-filter:blur(10px);
         padding:15px 0;
     }
@@ -24,11 +39,20 @@
     #modal {
         display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
         background:rgba(0,0,0,0.9); padding:40px; border-radius:25px; border:2px solid #ff00cc;
+        z-index: 20;
     }
     #modal h1 { font-size:40px; margin:0 0 10px 0; }
 </style>
 </head>
 <body>
+
+<!-- Container 4 Logo -->
+<div id="logo-container">
+    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (3).jpeg" alt="Logo Moko" class="game-logo" title="Moko Game Development">
+    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (2).jpeg" alt="Logo SMKN 1 Sanden" class="game-logo" title="SMKN 1 Sanden Bantul">
+    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (4).jpeg" alt="Logo One Sanden" class="game-logo" title="One Sanden Vocational School">
+    <img src="WhatsApp Image 2026-07-29 at 12.13.26.jpeg" alt="Logo RPL" class="game-logo" title="Rekayasa Perangkat Lunak">
+</div>
 
 <div id="ui">
     <div class="stat">Skor: <span id="score">0</span></div>
