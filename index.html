@@ -130,7 +130,6 @@ function sfx(f){
 
 let player = null, platforms = [], stars = [], time = 30, score = 0, level = 1, isRunning = false, mode = '1p', timer, playerTurn = 1, highScore = [0, 0];
 
-// Status tombol keyboard yang sedang ditekan
 const keys = { left: false, right: false };
 
 class Player{
@@ -146,18 +145,16 @@ class Player{
         this.vy += 0.4; 
         this.y += this.vy;
         
-        // Kontrol pergerakan horizontal via Tombol Panah Keyboard
         if (keys.left) {
             this.vx = -5;
         } else if (keys.right) {
             this.vx = 5;
         } else {
-            this.vx *= 0.85; // Efek perlambatan halus saat tombol dilepas
+            this.vx *= 0.85; 
         }
 
         this.x += this.vx;
 
-        // Batas layar kiri-kanan
         if(this.x < this.r) { this.x = this.r; this.vx = 0; }
         if(this.x > 800 - this.r) { this.x = 800 - this.r; this.vx = 0; }
 
@@ -168,18 +165,21 @@ class Player{
         }
         
         platforms.forEach(p => {
+            // Cek pendaratan agar skor hanya bertambah 1 kali per platform yang diinjak
             if(this.y + this.r > p.y && this.y + this.r < p.y + 18 && this.x > p.x && this.x < p.x + p.w && this.vy > 0){
-                this.y = p.y - this.r; 
-                this.vy = 0; 
-                this.onGround = true; 
-                score++; 
-                document.getElementById('score').innerText = score;
-                
-                let calculatedLevel = Math.floor(score / 10) + 1;
-                if(calculatedLevel > level){
-                    level = calculatedLevel;
+                if (!p.counted) {
+                    this.y = p.y - this.r; 
+                    this.vy = 0; 
+                    this.onGround = true; 
+                    score++; 
+                    p.counted = true; // Menandai platform sudah dihitung skornya
+                    
+                    // Perhitungan level naik tiap kelipatan 5 atau 10 skor
+                    level = Math.floor(score / 5) + 1;
+                    
+                    updateUI();
+                    sfx(800);
                 }
-                sfx(800);
             }
         });
     }
@@ -217,7 +217,7 @@ function startGame(m){
     level = 1; 
     
     for(let i = 0; i < 5; i++) {
-        platforms.push({x: Math.random() * 700, y: 400 - i * 80, w: 90});
+        platforms.push({x: Math.random() * 700, y: 400 - i * 80, w: 90, counted: false});
     }
     for(let i = 0; i < 40; i++) {
         stars.push({x: Math.random() * 800, y: Math.random() * 480});
@@ -235,7 +235,6 @@ function startGame(m){
     }, 1000);
 }
 
-// Event Listener Keyboard (Panah Kiri, Kanan, Atas, dan Spasi)
 window.addEventListener('keydown', (e) => {
     initAudio();
     if(!isRunning || !player) return;
@@ -259,7 +258,6 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
-// Event Listener untuk Layar Sentuh / Mouse (Geser / Swipe)
 let startX = 0, startY = 0;
 
 canvas.addEventListener('touchstart', (e) => {
@@ -307,6 +305,7 @@ function update(){
         if(p.y > 480){ 
             p.y = -20; 
             p.x = Math.random() * 700; 
+            p.counted = false; // Reset status hitung saat platform turun dari atas lagi
         }
     });
 }
