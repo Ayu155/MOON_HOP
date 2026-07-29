@@ -7,10 +7,12 @@
 <style>
     body {
         margin: 0; 
-        background: linear-gradient(rgba(255, 105, 180, 0.85), rgba(138, 43, 226, 0.9)), 
-                    url('WhatsApp Image 2026-07-29 at 12.13.25 (4).jpeg') no-repeat center center fixed;
+        background: linear-gradient(135deg, #ff69b4, #8a2be2);
         background-size: cover;
-        font-family: 'Segoe UI'; color: #fff; text-align: center; overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        color: #fff; 
+        text-align: center; 
+        overflow: hidden;
     }
     #logo-container {
         display: flex;
@@ -26,22 +28,23 @@
         border-radius: 50%;
         border: 2px solid #ff00cc;
         box-shadow: 0 0 10px rgba(255,0,204,0.5);
+        background: #333;
     }
     #ui {
         position: absolute; top: 75px; width: 100%; z-index: 10;
         background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
         padding: 15px 0;
     }
-   .stat { display: inline-block; margin: 0 25px; font-size: 22px; font-weight: bold; }
+    .stat { display: inline-block; margin: 0 25px; font-size: 22px; font-weight: bold; }
     button {
         background: linear-gradient(135deg, #ff00cc, #3333ff); border: none; 
         color: white; padding: 12px 25px; margin: 5px; border-radius: 30px; 
         font-weight: bold; cursor: pointer; font-size: 16px;
     }
-    canvas { display: block; margin: 0 auto; background: rgba(0, 0, 0, 0.2); }
+    canvas { display: block; margin: 0 auto; background: rgba(0, 0, 0, 0.3); }
     #modal {
         display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-        background: rgba(0, 0, 0, 0.9); padding: 40px; border-radius: 25px; border: 2px solid #ff00cc;
+        background: rgba(0, 0, 0, 0.95); padding: 40px; border-radius: 25px; border: 2px solid #ff00cc;
         z-index: 20;
     }
     #modal h1 { font-size: 40px; margin: 0 0 10px 0; }
@@ -49,12 +52,12 @@
 </head>
 <body>
 
-<!-- Container 4 Logo -->
+<!-- Container Logo -->
 <div id="logo-container">
-    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (3).jpeg" alt="Logo Moko" class="game-logo" title="Moko Game Development">
-    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (2).jpeg" alt="Logo SMKN 1 Sanden" class="game-logo" title="SMKN 1 Sanden Bantul">
-    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (4).jpeg" alt="Logo One Sanden" class="game-logo" title="One Sanden Vocational School">
-    <img src="WhatsApp Image 2026-07-29 at 12.13.26.jpeg" alt="Logo RPL" class="game-logo" title="Rekayasa Perangkat Lunak">
+    <div class="game-logo" title="Moko"></div>
+    <div class="game-logo" title="SMKN 1 Sanden"></div>
+    <div class="game-logo" title="One Sanden"></div>
+    <div class="game-logo" title="RPL"></div>
 </div>
 
 <div id="ui">
@@ -75,7 +78,8 @@
 <canvas id="c" width="800" height="600"></canvas>
 
 <script>
-const ctx = document.getElementById('c').getContext('2d');
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
 let audio = null;
 
 function initAudio() {
@@ -90,30 +94,41 @@ function initAudio() {
 function sfx(f){ 
     if (!audio) return;
     try {
-        const o=audio.createOscillator(), g=audio.createGain(); 
+        const o = audio.createOscillator(), g = audio.createGain(); 
         o.connect(g); g.connect(audio.destination);
-        o.frequency.value=f; 
+        o.frequency.value = f; 
         g.gain.setValueAtTime(0.3, audio.currentTime); 
-        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime+0.15);
-        o.start(); o.stop(audio.currentTime+0.15);
+        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.15);
+        o.start(); o.stop(audio.currentTime + 0.15);
     } catch(e) {}
 }
 
-let player, platforms=[], stars=[], time=30, score=0, level=1, isRunning=false, mode='1p', timer, playerTurn=1, highScore=[0,0];
+let player = null, platforms = [], stars = [], time = 30, score = 0, level = 1, isRunning = false, mode = '1p', timer, playerTurn = 1, highScore = [0, 0];
 
 class Player{
     constructor(){
-        this.x=400; this.y=500; this.vy=0; this.r=20; this.onGround=false;
+        this.x = 400; 
+        this.y = 500; 
+        this.vy = 0; 
+        this.r = 20; 
+        this.onGround = false;
     }
     update(){
         this.vy += 0.4; 
         this.y += this.vy;
-        if(this.y > 550){ this.y=550; this.vy=0; this.onGround=true; }
+        if(this.y > 550){ 
+            this.y = 550; 
+            this.vy = 0; 
+            this.onGround = true; 
+        }
         
-        platforms.forEach(p=>{
-            if(this.y+this.r>p.y && this.y+this.r<p.y+20 && this.x>p.x && this.x<p.x+100 && this.vy > 0){
-                this.y=p.y-this.r; this.vy=0; this.onGround=true; score++; 
-                document.getElementById('score').innerText=score;
+        platforms.forEach(p => {
+            if(this.y + this.r > p.y && this.y + this.r < p.y + 20 && this.x > p.x && this.x < p.x + p.w && this.vy > 0){
+                this.y = p.y - this.r; 
+                this.vy = 0; 
+                this.onGround = true; 
+                score++; 
+                document.getElementById('score').innerText = score;
                 
                 let calculatedLevel = Math.floor(score / 10) + 1;
                 if(calculatedLevel > level){
@@ -121,37 +136,58 @@ class Player{
                 }
                 sfx(800);
             }
-        })
+        });
     }
     jump(){
-        if(this.onGround){ this.vy=-12; this.onGround=false; sfx(600); }
+        if(this.onGround){ 
+            this.vy = -12; 
+            this.onGround = false; 
+            sfx(600); 
+        }
     }
     draw(){
-        ctx.shadowColor='#00e5ff'; ctx.shadowBlur=20;
-        ctx.fillStyle='#00e5ff'; ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill();
-        ctx.shadowBlur=0;
+        ctx.shadowColor = '#00e5ff'; 
+        ctx.shadowBlur = 20;
+        ctx.fillStyle = '#00e5ff'; 
+        ctx.beginPath(); 
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); 
+        ctx.fill();
+        ctx.shadowBlur = 0;
     }
 }
 
 function startGame(m){
     initAudio();
-    mode=m; document.getElementById('modal').style.display='none';
-    if(m==='2p' && playerTurn===2){ score=0; } 
-    player=new Player(); platforms=[]; stars=[];
-    score=0; level=1; 
-    for(let i=0;i<5;i++) platforms.push({x:Math.random()*700, y:500-i*100, w:100});
-    for(let i=0;i<50;i++) stars.push({x:Math.random()*800, y:Math.random()*600});
-    time=30; isRunning=true; updateUI();
+    mode = m; 
+    document.getElementById('modal').style.display = 'none';
+    if(m === '2p' && playerTurn === 2){ score = 0; } 
+    
+    player = new Player(); 
+    platforms = []; 
+    stars = [];
+    score = 0; 
+    level = 1; 
+    
+    for(let i = 0; i < 5; i++) {
+        platforms.push({x: Math.random() * 700, y: 500 - i * 100, w: 100});
+    }
+    for(let i = 0; i < 50; i++) {
+        stars.push({x: Math.random() * 800, y: Math.random() * 600});
+    }
+    
+    time = 30; 
+    isRunning = true; 
+    updateUI();
     
     clearInterval(timer);
-    timer=setInterval(()=>{
+    timer = setInterval(() => {
         time--; 
-        document.getElementById('time').innerText=time; 
-        if(time<=0) endGame();
-    },1000);
+        document.getElementById('time').innerText = time; 
+        if(time <= 0) endGame();
+    }, 1000);
 }
 
-function triggerJump(e){ 
+function triggerJump(){ 
     initAudio();
     if(isRunning && player) {
         player.jump(); 
@@ -159,28 +195,48 @@ function triggerJump(e){
 }
 
 window.addEventListener('click', triggerJump);
-window.addEventListener('touchstart', (e) => { 
-    triggerJump(); 
-}, { passive: true });
+window.addEventListener('keydown', (e) => {
+    if(e.code === 'Space') {
+        e.preventDefault();
+        triggerJump();
+    }
+});
 
 function update(){
     if(!isRunning || !player) return;
     player.update();
     
-    platforms.forEach(p=>{
+    platforms.forEach(p => {
         p.y += 2 + (level - 1) * 0.5;
-        if(p.y>600){ p.y=-20; p.x=Math.random()*700; }
-    })
+        if(p.y > 600){ 
+            p.y = -20; 
+            p.x = Math.random() * 700; 
+        }
+    });
 }
 
 function draw(){
-    ctx.clearRect(0,0,800,600);
-    stars.forEach(s=>{ctx.fillStyle='white'; ctx.fillRect(s.x,s.y,2,2);});
-    ctx.fillStyle='#666'; ctx.beginPath(); ctx.arc(400,580,200,0,Math.PI*2); ctx.fill();
+    ctx.clearRect(0, 0, 800, 600);
     
-    platforms.forEach(p=>{ctx.fillStyle='#aaa'; ctx.fillRect(p.x,p.y,p.w,20);});
+    // Gambar bintang
+    stars.forEach(s => {
+        ctx.fillStyle = 'white'; 
+        ctx.fillRect(s.x, s.y, 2, 2);
+    });
+    
+    // Gambar bulan di bawah
+    ctx.fillStyle = '#666'; 
+    ctx.beginPath(); 
+    ctx.arc(400, 580, 200, 0, Math.PI * 2); 
+    ctx.fill();
+    
+    // Gambar platform
+    platforms.forEach(p => {
+        ctx.fillStyle = '#aaa'; 
+        ctx.fillRect(p.x, p.y, p.w, 20);
+    });
+    
     if(player) player.draw();
-    updateUI();
 }
 
 function loop(){ 
@@ -189,36 +245,38 @@ function loop(){
     requestAnimationFrame(loop); 
 }
 
-// Mulai loop animasi utama
+// Mulai loop utama
 requestAnimationFrame(loop);
 
 function updateUI(){
-    document.getElementById('score').innerText=score;
-    document.getElementById('level').innerText=level;
-    document.getElementById('time').innerText=time;
+    document.getElementById('score').innerText = score;
+    document.getElementById('level').innerText = level;
+    document.getElementById('time').innerText = time;
 }
 
 function endGame(){
-    clearInterval(timer); isRunning=false; sfx(300);
-    let title=document.getElementById('mTitle'), desc=document.getElementById('mDesc');
+    clearInterval(timer); 
+    isRunning = false; 
+    sfx(300);
+    let title = document.getElementById('mTitle'), desc = document.getElementById('mDesc');
     
-    if(mode==='2p'){
-        highScore[playerTurn-1]=Math.max(highScore[playerTurn-1], score);
-        if(playerTurn===1){
-            playerTurn=2;
-            title.innerText="Giliran Player 2";
-            desc.innerText=`Skor P1: ${score}. Siap?`;
-        }else{
-            title.innerText= highScore[0]>highScore[1] ? "🏆 PLAYER 1 MENANG! 🏆" : "🏆 PLAYER 2 MENANG! 🏆";
-            if(highScore[0]===highScore[1]) title.innerText="⚖️ SERI! ⚖️";
-            desc.innerText=`Skor Akhir: P1=${highScore[0]} | P2=${highScore[1]}`;
-            playerTurn=1;
+    if(mode === '2p'){
+        highScore[playerTurn - 1] = Math.max(highScore[playerTurn - 1], score);
+        if(playerTurn === 1){
+            playerTurn = 2;
+            title.innerText = "Giliran Player 2";
+            desc.innerText = `Skor P1: ${score}. Siap?`;
+        } else {
+            title.innerText = highScore[0] > highScore[1] ? "🏆 PLAYER 1 MENANG! 🏆" : "🏆 PLAYER 2 MENANG! 🏆";
+            if(highScore[0] === highScore[1]) title.innerText = "⚖️ SERI! ⚖️";
+            desc.innerText = `Skor Akhir: P1=${highScore[0]} | P2=${highScore[1]}`;
+            playerTurn = 1;
         }
-    }else{
-        title.innerText="Waktu Habis!";
-        desc.innerText=`Skor kamu: ${score} (Level ${level})`;
+    } else {
+        title.innerText = "Waktu Habis!";
+        desc.innerText = `Skor kamu: ${score} (Level ${level})`;
     }
-    document.getElementById('modal').style.display='block';
+    document.getElementById('modal').style.display = 'block';
 }
 
 function handleBtn(){ 
