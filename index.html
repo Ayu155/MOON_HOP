@@ -75,12 +75,12 @@
 </head>
 <body>
 
-<!-- Container Logo -->
+<!-- Container Logo dengan Gambar Asli -->
 <div id="logo-container">
-    <div class="game-logo" title="Moko"></div>
-    <div class="game-logo" title="SMKN 1 Sanden"></div>
-    <div class="game-logo" title="One Sanden"></div>
-    <div class="game-logo" title="RPL"></div>
+    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (3).jpeg" alt="Logo Moko" class="game-logo" title="Moko Game Development">
+    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (2).jpeg" alt="Logo SMKN 1 Sanden" class="game-logo" title="SMKN 1 Sanden Bantul">
+    <img src="WhatsApp Image 2026-07-29 at 12.13.25 (4).jpeg" alt="Logo One Sanden" class="game-logo" title="One Sanden Vocational School">
+    <img src="WhatsApp Image 2026-07-29 at 12.13.26.jpeg" alt="Logo RPL" class="game-logo" title="Rekayasa Perangkat Lunak">
 </div>
 
 <div id="ui">
@@ -217,7 +217,6 @@ function triggerJump(e){
     }
 }
 
-// Event listener khusus area canvas dan tombol spasi agar aman diklik
 canvas.addEventListener('click', triggerJump);
 window.addEventListener('keydown', (e) => {
     if(e.code === 'Space') {
@@ -270,7 +269,7 @@ requestAnimationFrame(loop);
 
 function updateUI(){
     document.getElementById('score').innerText = score;
-    document.getElementById('level').innerText= level;
+    document.getElementById('level').innerText = level;
     document.getElementById('time').innerText = time;
 }
 
