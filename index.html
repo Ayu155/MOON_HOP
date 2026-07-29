@@ -6,15 +6,18 @@
 <title>Moon Hop - Game 1 Tombol</title>
 <style>
     body {
-        margin:0; background:linear-gradient(#000011, #1a0033);
-        font-family:'Segoe UI'; color:#fff; text-align:center; overflow:hidden;
+        margin: 0; 
+        background: linear-gradient(rgba(255, 105, 180, 0.85), rgba(138, 43, 226, 0.9)), 
+                    url('WhatsApp Image 2026-07-29 at 12.13.26_2.jpeg') no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Segoe UI'; color: #fff; text-align: center; overflow: hidden;
     }
     #logo-container {
         display: flex;
         justify-content: center;
         gap: 15px;
         padding: 10px;
-        background: rgba(0,0,0,0.2);
+        background: rgba(0,0,0,0.3);
     }
     .game-logo {
         width: 50px;
@@ -25,23 +28,23 @@
         box-shadow: 0 0 10px rgba(255,0,204,0.5);
     }
     #ui {
-        position:absolute; top:75px; width:100%; z-index:10;
-        background:rgba(255,255,255,0.05); backdrop-filter:blur(10px);
-        padding:15px 0;
+        position: absolute; top: 75px; width: 100%; z-index: 10;
+        background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
+        padding: 15px 0;
     }
-   .stat { display:inline-block; margin:0 25px; font-size:22px; font-weight:bold; }
+   .stat { display: inline-block; margin: 0 25px; font-size: 22px; font-weight: bold; }
     button {
-        background:linear-gradient(135deg,#ff00cc,#3333ff); border:none; 
-        color:white; padding:12px 25px; margin:5px; border-radius:30px; 
-        font-weight:bold; cursor:pointer; font-size:16px;
+        background: linear-gradient(135deg, #ff00cc, #3333ff); border: none; 
+        color: white; padding: 12px 25px; margin: 5px; border-radius: 30px; 
+        font-weight: bold; cursor: pointer; font-size: 16px;
     }
-    canvas { display:block; margin:0 auto; }
+    canvas { display: block; margin: 0 auto; background: rgba(0, 0, 0, 0.2); }
     #modal {
-        display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-        background:rgba(0,0,0,0.9); padding:40px; border-radius:25px; border:2px solid #ff00cc;
+        display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+        background: rgba(0, 0, 0, 0.9); padding: 40px; border-radius: 25px; border: 2px solid #ff00cc;
         z-index: 20;
     }
-    #modal h1 { font-size:40px; margin:0 0 10px 0; }
+    #modal h1 { font-size: 40px; margin: 0 0 10px 0; }
 </style>
 </head>
 <body>
@@ -143,6 +146,7 @@ function draw(){
     // bulan di bawah
     ctx.fillStyle='#666'; ctx.beginPath(); ctx.arc(400,580,200,0,Math.PI*2); ctx.fill();
     
+    platforms.php; // diperbaiki ke platform loop bawah
     platforms.forEach(p=>{ctx.fillStyle='#aaa'; ctx.fillRect(p.x,p.y,p.w,20);});
     player.draw();
     document.getElementById('score').innerText=score;
