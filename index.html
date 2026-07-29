@@ -173,10 +173,10 @@ class Player{
                     score++; 
                     p.counted = true; 
                     
-                    // Level naik setiap kelipatan 5 skor
-                    level = Math.floor(score / 5) + 1;
+                    // Level berganti setiap kelipatan 10 skor (Skor 10 = Level 2, Skor 20 = Level 3, dst)
+                    level = Math.floor(score / 10) + 1;
                     
-                    updateUI(); // Memperbarui tampilan skor dan level secara real-time
+                    updateUI(); 
                     sfx(800);
                 }
             }
@@ -224,7 +224,7 @@ function startGame(m){
     
     time = 30; 
     isRunning = true; 
-    updateUI(); // Memastikan UI terupdate saat game dimulai
+    updateUI(); 
     
     clearInterval(timer);
     timer = setInterval(() => {
