@@ -87,7 +87,6 @@
 
 <div id="ui">
     <div class="stat">Skor: <span id="score">0</span></div>
-    <div class="stat">⏰ <span id="time">30</span>s</div>
     <div class="stat">Level: <span id="level">1</span></div><br>
     <button id="btn1" onclick="startGame('1p')">🚀 Main Sendiri</button>
     <button id="btn2" onclick="startGame('2p')">👥 Adu Skor 2 Player</button>
@@ -128,7 +127,7 @@ function sfx(f){
     } catch(e) {}
 }
 
-let player = null, platforms = [], stars = [], time = 30, score = 0, level = 1, isRunning = false, mode = '1p', timer, playerTurn = 1, highScore = [0, 0];
+let player = null, platforms = [], stars = [], score = 0, level = 1, isRunning = false, mode = '1p', playerTurn = 1, highScore = [0, 0];
 
 const keys = { left: false, right: false };
 
@@ -173,7 +172,6 @@ class Player{
                     score++; 
                     p.counted = true; 
                     
-                    // Level berganti setiap kelipatan 10 skor (Skor 10 = Level 2, Skor 20 = Level 3, dst)
                     level = Math.floor(score / 10) + 1;
                     
                     updateUI(); 
@@ -222,16 +220,8 @@ function startGame(m){
         stars.push({x: Math.random() * 800, y: Math.random() * 480});
     }
     
-    time = 30; 
     isRunning = true; 
     updateUI(); 
-    
-    clearInterval(timer);
-    timer = setInterval(() => {
-        time--; 
-        document.getElementById('time').innerText = time; 
-        if(time <= 0) endGame();
-    }, 1000);
 }
 
 window.addEventListener('keydown', (e) => {
@@ -341,32 +331,6 @@ requestAnimationFrame(loop);
 function updateUI(){
     document.getElementById('score').innerText = score;
     document.getElementById('level').innerText = level;
-    document.getElementById('time').innerText = time;
-}
-
-function endGame(){
-    clearInterval(timer); 
-    isRunning = false; 
-    sfx(300);
-    let title = document.getElementById('mTitle'), desc = document.getElementById('mDesc');
-    
-    if(mode === '2p'){
-        highScore[playerTurn - 1] = Math.max(highScore[playerTurn - 1], score);
-        if(playerTurn === 1){
-            playerTurn = 2;
-            title.innerText = "Giliran Player 2";
-            desc.innerText = `Skor P1: ${score}. Siap?`;
-        } else {
-            title.innerText = highScore[0] > highScore[1] ? "🏆 PLAYER 1 MENANG! 🏆" : "🏆 PLAYER 2 MENANG! 🏆";
-            if(highScore[0] === highScore[1]) title.innerText = "⚖️ SERI! ⚖️";
-            desc.innerText = `Skor Akhir: P1=${highScore[0]} | P2=${highScore[1]}`;
-            playerTurn = 1;
-        }
-    } else {
-        title.innerText = "Waktu Habis!";
-        desc.innerText = `Skor kamu: ${score} (Level ${level})`;
-    }
-    document.getElementById('modal').style.display = 'block';
 }
 
 function handleBtn(){ 
