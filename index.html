@@ -143,11 +143,11 @@ class Player{
         this.vy += 0.4; 
         this.y += this.vy;
         
-        // Gerakan horizontal berdasarkan geseran (swipe)
+        // Pergerakan horizontal dengan efek geser/swipe
         this.x += this.vx;
-        this.vx *= 0.9; // Efek perlambatan (friction)
+        this.vx *= 0.9; // Perlambatan
 
-        // Batas layar kiri-kanan
+        // Batas layar
         if(this.x < this.r) { this.x = this.r; this.vx = 0; }
         if(this.x > 800 - this.r) { this.x = 800 - this.r; this.vx = 0; }
 
@@ -176,7 +176,7 @@ class Player{
     jump(direction = 0){
         if(this.onGround){ 
             this.vy = -11; 
-            this.vx = direction * 6; // Memberikan dorongan kesamping saat melompat searah geseran
+            this.vx = direction * 6; // Dorongan ke kiri (-1) atau ke kanan (1)
             this.onGround = false; 
             sfx(600); 
         }
@@ -223,9 +223,8 @@ function startGame(m){
     }, 1000);
 }
 
-// Logika Kontrol Geser (Swipe / Drag)
-let startX = 0;
-let startY = 0;
+// Logika Geser (Swipe / Drag) Layar & Mouse
+let startX = 0, startY = 0;
 
 canvas.addEventListener('touchstart', (e) => {
     initAudio();
@@ -235,22 +234,16 @@ canvas.addEventListener('touchstart', (e) => {
 
 canvas.addEventListener('touchend', (e) => {
     if(!isRunning || !player) return;
-    let endX = e.changedTouches[0].clientX;
-    let endY = e.changedTouches[0].clientY;
-    let diffX = endX - startX;
-    let diffY = endY - startY;
+    let diffX = e.changedTouches[0].clientX - startX;
+    let diffY = e.changedTouches[0].clientY - startY;
 
-    // Jika geseran horizontal lebih dominan
     if(Math.abs(diffX) > Math.abs(diffY)) {
-        let dir = diffX > 0 ? 1 : -1;
-        player.jump(dir);
+        player.jump(diffX > 0 ? 1 : -1);
     } else {
-        // Jika tap biasa atau geser ke atas
         player.jump(0);
     }
 });
 
-// Kontrol Mouse untuk Drag di PC/Laptop
 canvas.addEventListener('mousedown', (e) => {
     initAudio();
     startX = e.clientX;
@@ -259,14 +252,11 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mouseup', (e) => {
     if(!isRunning || !player) return;
-    let endX = e.clientX;
-    let endY = e.clientY;
-    let diffX = endX - startX;
-    let diffY = endY - startY;
+    let diffX = e.clientX - startX;
+    let diffY = e.clientY - startY;
 
     if(Math.abs(diffX) > Math.abs(diffY)) {
-        let dir = diffX > 0 ? 1 : -1;
-        player.jump(dir);
+        player.jump(diffX > 0 ? 1 : -1);
     } else {
         player.jump(0);
     }
