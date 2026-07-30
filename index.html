@@ -185,11 +185,12 @@ class Particle {
 class Player {
     constructor(){
         this.x = 400; 
-        this.y = 350; 
+        this.y = 300; 
         this.vx = 0;
         this.vy = 0; 
         this.r = 16; 
         this.onGround = false;
+        this.lastPlatform = null; // Menyimpan platform terakhir yang diinjak
     }
     update(){
         this.vy += 0.42; 
@@ -208,19 +209,23 @@ class Player {
         if(this.x < this.r) { this.x = this.r; this.vx = 0; }
         if(this.x > 800 - this.r) { this.x = 800 - this.r; this.vx = 0; }
 
-        // Cek jatuh ke bawah / Game Over
         if(this.y > 470){ 
             gameOver();
         }
         
+        let landed = false;
         platforms.forEach(p => {
-            if(this.y + this.r >= p.y && this.y + this.r <= p.y + 16 && this.x >= p.x - 5 && this.x <= p.x + p.w + 5 && this.vy > 0){
-                if (!p.counted) {
-                    this.y = p.y - this.r; 
-                    this.vy = 0; 
-                    this.onGround = true; 
+            // Deteksi tabrakan dari atas ke bawah platform
+            if(this.y + this.r >= p.y && this.y + this.r <= p.y + 18 && this.x >= p.x - 5 && this.x <= p.x + p.w + 5 && this.vy > 0){
+                this.y = p.y - this.r; 
+                this.vy = 0; 
+                this.onGround = true; 
+                landed = true;
+
+                // Skor bertambah HANYA JIKA mendarat di platform yang berbeda dari sebelumnya
+                if (this.lastPlatform !== p) {
                     score++; 
-                    p.counted = true; 
+                    this.lastPlatform = p;
                     
                     let newLevel = Math.floor(score / 10) + 1;
                     if(newLevel > level) {
@@ -230,7 +235,6 @@ class Player {
                         sfx('score');
                     }
                     
-                    // Efek partikel pendaratan
                     for(let i=0; i<6; i++) {
                         particles.push(new Particle(this.x, this.y + this.r, '#00e5ff'));
                     }
@@ -239,6 +243,11 @@ class Player {
                 }
             }
         });
+
+        // Jika pemain melompat (tidak di atas platform), reset acuan platform terakhir
+        if(!this.onGround && this.vy < 0) {
+            // biarkan
+        }
     }
     jump(direction = 0){
         if(this.onGround){ 
@@ -247,6 +256,7 @@ class Player {
                 this.vx = direction * 6.5;
             }
             this.onGround = false; 
+            this.lastPlatform = null; // Lepas acuan platform agar bisa dihitung skor lagi saat mendarat berikutnya
             sfx('jump'); 
 
             for(let i=0; i<6; i++) {
@@ -262,7 +272,6 @@ class Player {
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); 
         ctx.fill();
         
-        // Kilau kecil di bola (karakter)
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(this.x - 5, this.y - 5, 4, 0, Math.PI * 2);
@@ -294,7 +303,6 @@ function startGame(m){
             x: Math.random() * 680, 
             y: 400 - i * 75, 
             w: 95, 
-            counted: false, 
             dir: (Math.random() > 0.5 ? 1 : -1)
         });
     }
@@ -408,7 +416,6 @@ function update(){
     platforms.forEach(p => {
         p.y += platformSpeed;
         
-        // Platform bergerak horizontal mulai level 3 ke atas
         if(level >= 3) {
             p.x += p.dir * (1 + level * 0.1);
             if(p.x < 0 || p.x > 800 - p.w) p.dir *= -1;
@@ -417,7 +424,6 @@ function update(){
         if(p.y > 450){ 
             p.y = -20; 
             p.x = Math.random() * 680; 
-            p.counted = false; 
             p.dir = Math.random() > 0.5 ? 1 : -1;
         }
     });
@@ -431,22 +437,18 @@ function update(){
 function draw(){
     ctx.clearRect(0, 0, 800, 450);
     
-    // Background bintang
     stars.forEach(s => {
         ctx.fillStyle = 'rgba(255,255,255,0.8)'; 
         ctx.fillRect(s.x, s.y, s.size, s.size);
     });
     
-    // Planet/Bulan di latar belakang bawah
     ctx.fillStyle = 'rgba(100, 50, 150, 0.25)'; 
     ctx.beginPath(); 
     ctx.arc(400, 480, 180, 0, Math.PI * 2); 
     ctx.fill();
     
-    // Gambar Partikel
     particles.forEach(pt => pt.draw());
 
-    // Gambar Platform
     platforms.forEach(p => {
         ctx.shadowColor = '#ff00cc';
         ctx.shadowBlur = 8;
@@ -470,12 +472,8 @@ function updateUI(){
     document.getElementById('score').innerText = score;
     document.getElementById('level').innerText = level;
     if(mode === '2p') {
-        document.getElementById('turnInfo').innerText = `GILIRAN: PLAYER ${playerTwinText()}`;
+        document.getElementById('turnInfo').innerText = `GILIRAN: PLAYER ${playerTurn}`;
     }
-}
-
-function playerTwinText() {
-    return playerTurn;
 }
 
 function handleBtn(){ 
