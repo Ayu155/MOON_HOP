@@ -185,12 +185,12 @@ class Particle {
 class Player {
     constructor(){
         this.x = 400; 
-        this.y = 300; 
+        this.y = 100; // DIPERBAIKI: Posisi awal aman di tengah atas layar
         this.vx = 0;
         this.vy = 0; 
         this.r = 16; 
         this.onGround = false;
-        this.lastPlatform = null; // Menyimpan platform terakhir yang diinjak
+        this.lastPlatform = null;
     }
     update(){
         this.vy += 0.42; 
@@ -213,16 +213,12 @@ class Player {
             gameOver();
         }
         
-        let landed = false;
         platforms.forEach(p => {
-            // Deteksi tabrakan dari atas ke bawah platform
             if(this.y + this.r >= p.y && this.y + this.r <= p.y + 18 && this.x >= p.x - 5 && this.x <= p.x + p.w + 5 && this.vy > 0){
                 this.y = p.y - this.r; 
                 this.vy = 0; 
                 this.onGround = true; 
-                landed = true;
 
-                // Skor bertambah HANYA JIKA mendarat di platform yang berbeda dari sebelumnya
                 if (this.lastPlatform !== p) {
                     score++; 
                     this.lastPlatform = p;
@@ -243,11 +239,6 @@ class Player {
                 }
             }
         });
-
-        // Jika pemain melompat (tidak di atas platform), reset acuan platform terakhir
-        if(!this.onGround && this.vy < 0) {
-            // biarkan
-        }
     }
     jump(direction = 0){
         if(this.onGround){ 
@@ -256,7 +247,7 @@ class Player {
                 this.vx = direction * 6.5;
             }
             this.onGround = false; 
-            this.lastPlatform = null; // Lepas acuan platform agar bisa dihitung skor lagi saat mendarat berikutnya
+            this.lastPlatform = null; 
             sfx('jump'); 
 
             for(let i=0; i<6; i++) {
@@ -301,7 +292,7 @@ function startGame(m){
     for(let i = 0; i < 6; i++) {
         platforms.push({
             x: Math.random() * 680, 
-            y: 400 - i * 75, 
+            y: 150 + i * 55, 
             w: 95, 
             dir: (Math.random() > 0.5 ? 1 : -1)
         });
