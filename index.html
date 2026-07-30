@@ -7,7 +7,7 @@
 <style>
     body {
         margin: 0; 
-        background: linear-gradient(135deg, #1a0b2e, #4a154b, #2c003e);
+        background: linear-gradient(135deg, #ff69b4, #8a2be2);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         color: #fff; 
         text-align: center; 
@@ -19,56 +19,46 @@
         display: flex;
         justify-content: center;
         gap: 15px;
-        padding: 6px;
-        background: rgba(0,0,0,0.4);
-        backdrop-filter: blur(8px);
+        padding: 8px;
+        background: rgba(0,0,0,0.3);
     }
     .game-logo {
-        width: 38px;
-        height: 38px;
+        width: 40px;
+        height: 40px;
         object-fit: cover;
         border-radius: 50%;
         border: 2px solid #ff00cc;
         background: #333;
-        box-shadow: 0 0 8px rgba(255, 0, 204, 0.6);
     }
     #ui {
         position: relative;
         z-index: 10;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(8px);
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(5px);
         padding: 10px 0;
-        border-bottom: 2px solid rgba(255, 0, 204, 0.3);
     }
-    .stat { display: inline-block; margin: 0 12px; font-size: 16px; font-weight: bold; text-shadow: 0 0 5px rgba(0,229,255,0.6); }
+    .stat { display: inline-block; margin: 0 15px; font-size: 18px; font-weight: bold; }
     button {
         background: linear-gradient(135deg, #ff00cc, #3333ff); 
         border: none; 
         color: white; 
-        padding: 10px 22px; 
-        margin: 4px; 
+        padding: 10px 20px; 
+        margin: 5px; 
         border-radius: 30px; 
         font-weight: bold; 
         cursor: pointer; 
-        font-size: 14px;
-        box-shadow: 0 4px 15px rgba(255, 0, 204, 0.4);
-        transition: transform 0.1s, opacity 0.2s;
+        font-size: 15px;
+        position: relative;
+        z-index: 20;
     }
     button:hover {
         opacity: 0.9;
-        transform: scale(1.05);
-    }
-    button:active {
-        transform: scale(0.95);
     }
     canvas { 
         display: block; 
-        margin: 15px auto; 
-        background: rgba(10, 5, 25, 0.6); 
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(255, 0, 204, 0.15);
+        margin: 0 auto; 
+        background: rgba(0, 0, 0, 0.3); 
         touch-action: none;
-        border: 2px solid rgba(255, 255, 255, 0.1);
     }
     #modal {
         display: none; 
@@ -76,23 +66,18 @@
         top: 50%; 
         left: 50%; 
         transform: translate(-50%,-50%);
-        background: rgba(15, 5, 30, 0.95); 
-        backdrop-filter: blur(15px);
+        background: rgba(0, 0, 0, 0.95); 
         padding: 30px; 
         border-radius: 25px; 
         border: 2px solid #ff00cc;
         z-index: 100;
-        box-shadow: 0 0 40px rgba(255, 0, 204, 0.6);
-        max-width: 350px;
-        width: 85%;
     }
-    #modal h1 { font-size: 26px; margin: 0 0 10px 0; color: #ff00cc; text-shadow: 0 0 10px rgba(255,0,204,0.5); }
-    #modal p { font-size: 15px; line-height: 1.5; margin-bottom: 20px; }
+    #modal h1 { font-size: 30px; margin: 0 0 10px 0; }
 </style>
 </head>
 <body>
 
-<!-- Container Logo -->
+<!-- Container Logo dengan Gambar Asli -->
 <div id="logo-container">
     <img src="WhatsApp Image 2026-07-29 at 12.13.25 (3).jpeg" alt="Logo Moko" class="game-logo" title="Moko Game Development">
     <img src="WhatsApp Image 2026-07-29 at 12.13.25 (2).jpeg" alt="Logo SMKN 1 Sanden" class="game-logo" title="SMKN 1 Sanden Bantul">
@@ -102,20 +87,19 @@
 
 <div id="ui">
     <div class="stat">Skor: <span id="score">0</span></div>
-    <div class="stat">Level: <span id="level">1</span></div>
-    <div class="stat">Rekor: <span id="highscore">0</span></div><br>
+    <div class="stat">Level: <span id="level">1</span></div><br>
     <button id="btn1" onclick="startGame('1p')">🚀 Main Sendiri</button>
     <button id="btn2" onclick="startGame('2p')">👥 Adu Skor 2 Player</button>
-    <div style="font-size: 12px; margin-top: 6px; opacity: 0.7;" id="turnInfo">GUNAKAN TOMBOL PANAH (⬅️ ➡️ ⬆️) ATAU GESER LAYAR</div>
+    <div style="font-size: 13px; margin-top: 5px; opacity: 0.8;">GUNAKAN TOMBOL PANAH (⬅️ ➡️ ⬆️) ATAU GESER LAYAR</div>
 </div>
 
 <div id="modal">
-    <h1 id="mTitle">Game Over</h1>
-    <p id="mDesc">Skor Kamu: 0</p>
+    <h1 id="mTitle"></h1>
+    <p id="mDesc"></p>
     <button onclick="handleBtn()">Main Lagi</button>
 </div>
 
-<canvas id="c" width="800" height="450"></canvas>
+<canvas id="c" width="800" height="480"></canvas>
 
 <script>
 const canvas = document.getElementById('c');
@@ -131,75 +115,39 @@ function initAudio() {
     }
 }
 
-function sfx(type){ 
+function sfx(f){ 
     if (!audio) return;
     try {
         const o = audio.createOscillator(), g = audio.createGain(); 
         o.connect(g); g.connect(audio.destination);
-        
-        let freq = 600, duration = 0.15;
-        if(type === 'jump') { freq = 550; }
-        else if(type === 'score') { freq = 880; duration = 0.1; }
-        else if(type === 'levelup') { freq = 1100; duration = 0.25; }
-        else if(type === 'gameover') { freq = 180; duration = 0.4; }
-
-        o.frequency.value = freq; 
-        g.gain.setValueAtTime(0.2, audio.currentTime); 
-        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + duration);
-        o.start(); o.stop(audio.currentTime + duration);
+        o.frequency.value = f; 
+        g.gain.setValueAtTime(0.3, audio.currentTime); 
+        g.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.15);
+        o.start(); o.stop(audio.currentTime + 0.15);
     } catch(e) {}
 }
 
-let player = null, platforms = [], stars = [], particles = [], score = 0, level = 1, isRunning = false, mode = '1p', playerTurn = 1, scores2P = [0, 0];
-let highScore = localStorage.getItem('moonhop_highscore') || 0;
-document.getElementById('highscore').innerText = highScore;
+let player = null, platforms = [], stars = [], score = 0, level = 1, isRunning = false, mode = '1p', playerTurn = 1, highScore = [0, 0];
 
 const keys = { left: false, right: false };
 
-class Particle {
-    constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.vx = (Math.random() - 0.5) * 6;
-        this.vy = (Math.random() - 0.5) * 6;
-        this.alpha = 1;
-        this.color = color;
-        this.size = Math.random() * 3 + 2;
-    }
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= 0.03;
-    }
-    draw() {
-        ctx.save();
-        ctx.globalAlpha = Math.max(this.alpha, 0);
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    }
-}
-
-class Player {
+class Player{
     constructor(){
         this.x = 400; 
-        this.y = 200; 
+        this.y = 400; 
         this.vx = 0;
         this.vy = 0; 
-        this.r = 16; 
+        this.r = 18; 
         this.onGround = false;
-        this.lastPlatform = null;
     }
     update(){
         this.vy += 0.4; 
         this.y += this.vy;
         
         if (keys.left) {
-            this.vx = -5.5;
+            this.vx = -5;
         } else if (keys.right) {
-            this.vx = 5.5;
+            this.vx = 5;
         } else {
             this.vx *= 0.85; 
         }
@@ -209,52 +157,37 @@ class Player {
         if(this.x < this.r) { this.x = this.r; this.vx = 0; }
         if(this.x > 800 - this.r) { this.x = 800 - this.r; this.vx = 0; }
 
-        if(this.y > 470){ 
-            gameOver();
+        if(this.y > 440){ 
+            this.y = 440; 
+            this.vy = 0; 
+            this.onGround = true; 
         }
         
-        this.onGround = false;
         platforms.forEach(p => {
-            // Deteksi pijakan di atas platform
-            if(this.y + this.r >= p.y && this.y + this.r <= p.y + 16 && this.x >= p.x - 10 && this.x <= p.x + p.w + 10 && this.vy >= 0){
-                this.y = p.y - this.r; 
-                this.vy = 0; 
-                this.onGround = true; 
-
-                if (this.lastPlatform !== p) {
+            if(this.y + this.r > p.y && this.y + this.r < p.y + 18 && this.x > p.x && this.x < p.x + p.w && this.vy > 0){
+                if (!p.counted) {
+                    this.y = p.y - this.r; 
+                    this.vy = 0; 
+                    this.onGround = true; 
                     score++; 
-                    this.lastPlatform = p;
+                    p.counted = true; 
                     
-                    let newLevel = Math.floor(score / 10) + 1;
-                    if(newLevel > level) {
-                        level = newLevel;
-                        sfx('levelup');
-                    } else {
-                        sfx('score');
-                    }
+                    level = Math.floor(score / 10) + 1;
                     
-                    for(let i=0; i<5; i++) {
-                        particles.push(new Particle(this.x, this.y + this.r, '#00e5ff'));
-                    }
-
                     updateUI(); 
+                    sfx(800);
                 }
             }
         });
     }
     jump(direction = 0){
         if(this.onGround){ 
-            this.vy = -10.5; 
+            this.vy = -11; 
             if(direction !== 0) {
                 this.vx = direction * 6;
             }
             this.onGround = false; 
-            this.lastPlatform = null; 
-            sfx('jump'); 
-
-            for(let i=0; i<5; i++) {
-                particles.push(new Particle(this.x, this.y + this.r, '#ff00cc'));
-            }
+            sfx(600); 
         }
     }
     draw(){
@@ -264,12 +197,6 @@ class Player {
         ctx.beginPath(); 
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); 
         ctx.fill();
-        
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(this.x - 4, this.y - 4, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-        
         ctx.shadowBlur = 0;
     }
 }
@@ -278,68 +205,23 @@ function startGame(m){
     initAudio();
     mode = m; 
     document.getElementById('modal').style.display = 'none';
-    
-    if(m === '2p' && playerTurn === 2){ 
-        score = 0; 
-    } else if(m === '1p') {
-        score = 0;
-    }
+    if(m === '2p' && playerTurn === 2){ score = 0; } 
     
     player = new Player(); 
     platforms = []; 
     stars = [];
-    particles = [];
+    score = 0; 
     level = 1; 
     
-    // Buat platform secara vertikal dari bawah ke atas layar
-    for(let i = 0; i < 6; i++) {
-        platforms.push({
-            x: Math.random() * 650 + 50, 
-            y: 400 - (i * 75), 
-            w: 100, 
-            dir: (Math.random() > 0.5 ? 1 : -1)
-        });
+    for(let i = 0; i < 5; i++) {
+        platforms.push({x: Math.random() * 700, y: 400 - i * 80, w: 90, counted: false});
     }
-
     for(let i = 0; i < 40; i++) {
-        stars.push({x: Math.random() * 800, y: Math.random() * 450, size: Math.random() * 2});
+        stars.push({x: Math.random() * 800, y: Math.random() * 480});
     }
     
     isRunning = true; 
     updateUI(); 
-}
-
-function gameOver() {
-    isRunning = false;
-    sfx('gameover');
-
-    if(score > highScore) {
-        highScore = score;
-        localStorage.setItem('moonhop_highscore', highScore);
-        document.getElementById('highscore').innerText = highScore;
-    }
-
-    let modal = document.getElementById('modal');
-    let mTitle = document.getElementById('mTitle');
-    let mDesc = document.getElementById('mDesc');
-
-    if(mode === '1p') {
-        mTitle.innerText = "Game Over!";
-        mDesc.innerHTML = `Skor Akhir Kamu: <b>${score}</b><br>Level Tercapai: ${level}`;
-    } else {
-        scores2P[playerTurn - 1] = score;
-        if(playerTurn === 1) {
-            mTitle.innerText = `Giliran Player 2 Selesai!`;
-            mDesc.innerHTML = `Skor Player 1: ${scores2P[0]}<br>Sekarang giliran Player 2. Siap?`;
-            playerTurn = 2;
-        } else {
-            mTitle.innerText = `Hasil Adu Skor 2 Player`;
-            let winner = scores2P[0] > scores2P[1] ? "Player 1 Menang! 🏆" : (scores2P[1] > scores2P[0] ? "Player 2 Menang! 🏆" : "Seri! 🤝");
-            mDesc.innerHTML = `Skor P1: ${scores2P[0]}<br>Skor P2: ${scores2P[1]}<br><br><b>${winner}</b>`;
-            playerTurn = 1;
-        }
-    }
-    modal.style.display = 'block';
 }
 
 window.addEventListener('keydown', (e) => {
@@ -407,49 +289,32 @@ function update(){
     if(!isRunning || !player) return;
     player.update();
     
-    let platformSpeed = 1.5 + (level - 1) * 0.3;
     platforms.forEach(p => {
-        p.y += platformSpeed;
-        
-        if(level >= 3) {
-            p.x += p.dir * (1 + level * 0.1);
-            if(p.x < 0 || p.x > 800 - p.w) p.dir *= -1;
-        }
-
-        if(p.y > 470){ 
+        p.y += 1.8 + (level - 1) * 0.4;
+        if(p.y > 480){ 
             p.y = -20; 
-            p.x = Math.random() * 650 + 50; 
-            p.dir = Math.random() > 0.5 ? 1 : -1;
+            p.x = Math.random() * 700; 
+            p.counted = false; 
         }
-    });
-
-    particles.forEach((pt, index) => {
-        pt.update();
-        if(pt.alpha <= 0) particles.splice(index, 1);
     });
 }
 
 function draw(){
-    ctx.clearRect(0, 0, 800, 450);
+    ctx.clearRect(0, 0, 800, 480);
     
     stars.forEach(s => {
-        ctx.fillStyle = 'rgba(255,255,255,0.8)'; 
-        ctx.fillRect(s.x, s.y, s.size, s.size);
+        ctx.fillStyle = 'white'; 
+        ctx.fillRect(s.x, s.y, 2, 2);
     });
     
-    ctx.fillStyle = 'rgba(100, 50, 150, 0.25)'; 
+    ctx.fillStyle = '#555'; 
     ctx.beginPath(); 
-    ctx.arc(400, 480, 180, 0, Math.PI * 2); 
+    ctx.arc(400, 470, 160, 0, Math.PI * 2); 
     ctx.fill();
     
-    particles.forEach(pt => pt.draw());
-
     platforms.forEach(p => {
-        ctx.shadowColor = '#ff00cc';
-        ctx.shadowBlur = 8;
-        ctx.fillStyle = '#ff69b4'; 
-        ctx.fillRect(p.x, p.y, p.w, 14);
-        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#aaa'; 
+        ctx.fillRect(p.x, p.y, p.w, 16);
     });
     
     if(player) player.draw();
@@ -466,9 +331,6 @@ requestAnimationFrame(loop);
 function updateUI(){
     document.getElementById('score').innerText = score;
     document.getElementById('level').innerText = level;
-    if(mode === '2p') {
-        document.getElementById('turnInfo').innerText = `GILIRAN: PLAYER ${playerTurn}`;
-    }
 }
 
 function handleBtn(){ 
