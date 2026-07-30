@@ -185,7 +185,7 @@ class Particle {
 class Player {
     constructor(){
         this.x = 400; 
-        this.y = 100; // DIPERBAIKI: Posisi awal aman di tengah atas layar
+        this.y = 200; 
         this.vx = 0;
         this.vy = 0; 
         this.r = 16; 
@@ -193,7 +193,7 @@ class Player {
         this.lastPlatform = null;
     }
     update(){
-        this.vy += 0.42; 
+        this.vy += 0.4; 
         this.y += this.vy;
         
         if (keys.left) {
@@ -213,8 +213,10 @@ class Player {
             gameOver();
         }
         
+        this.onGround = false;
         platforms.forEach(p => {
-            if(this.y + this.r >= p.y && this.y + this.r <= p.y + 18 && this.x >= p.x - 5 && this.x <= p.x + p.w + 5 && this.vy > 0){
+            // Deteksi pijakan di atas platform
+            if(this.y + this.r >= p.y && this.y + this.r <= p.y + 16 && this.x >= p.x - 10 && this.x <= p.x + p.w + 10 && this.vy >= 0){
                 this.y = p.y - this.r; 
                 this.vy = 0; 
                 this.onGround = true; 
@@ -231,7 +233,7 @@ class Player {
                         sfx('score');
                     }
                     
-                    for(let i=0; i<6; i++) {
+                    for(let i=0; i<5; i++) {
                         particles.push(new Particle(this.x, this.y + this.r, '#00e5ff'));
                     }
 
@@ -242,15 +244,15 @@ class Player {
     }
     jump(direction = 0){
         if(this.onGround){ 
-            this.vy = -11.5; 
+            this.vy = -10.5; 
             if(direction !== 0) {
-                this.vx = direction * 6.5;
+                this.vx = direction * 6;
             }
             this.onGround = false; 
             this.lastPlatform = null; 
             sfx('jump'); 
 
-            for(let i=0; i<6; i++) {
+            for(let i=0; i<5; i++) {
                 particles.push(new Particle(this.x, this.y + this.r, '#ff00cc'));
             }
         }
@@ -265,7 +267,7 @@ class Player {
         
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(this.x - 5, this.y - 5, 4, 0, Math.PI * 2);
+        ctx.arc(this.x - 4, this.y - 4, 3.5, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.shadowBlur = 0;
@@ -289,15 +291,17 @@ function startGame(m){
     particles = [];
     level = 1; 
     
+    // Buat platform secara vertikal dari bawah ke atas layar
     for(let i = 0; i < 6; i++) {
         platforms.push({
-            x: Math.random() * 680, 
-            y: 150 + i * 55, 
-            w: 95, 
+            x: Math.random() * 650 + 50, 
+            y: 400 - (i * 75), 
+            w: 100, 
             dir: (Math.random() > 0.5 ? 1 : -1)
         });
     }
-    for(let i = 0; i < 50; i++) {
+
+    for(let i = 0; i < 40; i++) {
         stars.push({x: Math.random() * 800, y: Math.random() * 450, size: Math.random() * 2});
     }
     
@@ -403,7 +407,7 @@ function update(){
     if(!isRunning || !player) return;
     player.update();
     
-    let platformSpeed = 1.6 + (level - 1) * 0.35;
+    let platformSpeed = 1.5 + (level - 1) * 0.3;
     platforms.forEach(p => {
         p.y += platformSpeed;
         
@@ -412,9 +416,9 @@ function update(){
             if(p.x < 0 || p.x > 800 - p.w) p.dir *= -1;
         }
 
-        if(p.y > 450){ 
+        if(p.y > 470){ 
             p.y = -20; 
-            p.x = Math.random() * 680; 
+            p.x = Math.random() * 650 + 50; 
             p.dir = Math.random() > 0.5 ? 1 : -1;
         }
     });
